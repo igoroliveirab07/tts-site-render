@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SpeakEasy</title>
+</head>
+<body>
+
+  <h1>SpeakEasy – English Text to Speech</h1>
+
+  <textarea id="text" rows="5" cols="50" placeholder="Type text in English"></textarea>
+  <br><br>
+
+  <button onclick="generateAudio()">Generate Audio</button>
+
+  <p id="status"></p>
+
+  <audio id="audio" controls></audio>
+  <br><br>
+
+  <a id="download" download="audio.mp3">Download Audio</a>
+
+  <!-- ✅ JAVASCRIPT SEMPRE DENTRO DO SCRIPT -->
+  <script>
+    async function generateAudio() {
+      const text = document.getElementById("text").value;
+      const status = document.getElementById("status");
+
+      if (!text) {
+        alert("Digite um texto em inglês");
+        return;
+      }
+
+      status.innerText = "⏳ Gerando áudio, aguarde...";
+
+      try {
+        const response = await fetch("/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+
+        const data = await response.json();
+
+        if (data.audio) {
+          document.getElementById("audio").src =
+            data.audio + "?t=" + Date.now();
+
+          document.getElementById("download").href = data.audio;
+
+          status.innerText = "✅ Áudio pronto!";
+        } else {
+          status.innerText = "❌ Erro ao gerar áudio";
+        }
+      } catch (err) {
+        status.innerText = "❌ Erro de conexão";
+      }
+    }
+  </script>
+
+</body>
+</html>
