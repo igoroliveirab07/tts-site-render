@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
@@ -6,21 +8,34 @@ const OpenAI = require("openai");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+/* =========================
+   MIDDLEWARES
+========================= */
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-// Página principal
+// Servir arquivos estáticos da pasta public
+app.use(express.static(path.join(process.cwd(), "public")));
+
+/* =========================
+   ROTA PRINCIPAL
+   (blindada contra erro de src)
+========================= */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(
+    path.resolve(process.cwd(), "public", "index.html")
+  );
 });
 
-// OpenAI
+/* =========================
+   OPENAI CONFIG
+========================= */
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 🎤 ROTA TEXT TO SPEECH
+/* =========================
+   TEXT TO SPEECH
+========================= */
 app.post("/tts", async (req, res) => {
   try {
     const { text } = req.body;
@@ -35,18 +50,24 @@ app.post("/tts", async (req, res) => {
       input: text,
     });
 
-    const audioPath = path.join(__dirname, "public", "audio.mp3");
+    const audioPath = path.resolve(process.cwd(), "public", "audio.mp3");
     const buffer = Buffer.from(await response.arrayBuffer());
+
     fs.writeFileSync(audioPath, buffer);
 
-    res.json({ success: true, audio: "/audio.mp3" });
+    res.json({
+      success: true,
+      audio: "/audio.mp3",
+    });
   } catch (error) {
     console.error("Erro TTS:", error);
     res.status(500).json({ error: "Erro ao gerar áudio" });
   }
 });
 
-// Iniciar servidor
+/* =========================
+   START SERVER
+========================= */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
