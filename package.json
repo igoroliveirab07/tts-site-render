@@ -1,20 +1,17 @@
 {
+{
   "name": "tts-site",
   "version": "1.0.0",
-  "description": "",
+  "description": "Text to Speech Site",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^4.19.2",
+    "express": "^5.2.1",
     "openai": "^6.16.0"
   }
-}
 }
